@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.clwater.compose_learn_1.ui.theme.Compose_Learn_1Theme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -23,7 +24,6 @@ class MainActivity : ComponentActivity() {
     }
 
     class LaunchedEffectTestViewModel : ViewModel() {
-//        val showSnackbar = mutableStateOf(false)
         val snackbarCount = mutableStateOf(0)
         val showInnerButton = mutableStateOf(true)
         val showCommonButton = mutableStateOf(true)
@@ -48,7 +48,58 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TestLifecycleCompose() {
         val viewModel = LaunchedEffectTestViewModel()
-        Test1(viewModel)
+//        Test1(viewModel)
+        Test2()
+    }
+
+    @Composable
+    fun DelayText(touchCount: Int, snackbarHostState: SnackbarHostState) {
+        Log.d("gzb", "DelayText: $touchCount")
+        val rememberedText by rememberUpdatedState(newValue = touchCount)
+        LaunchedEffect(Unit) {
+            delay(3000)
+            snackbarHostState.showSnackbar("DelayText: $rememberedText")
+//            snackbarHostState.showSnackbar("DelayText: $touchCount")
+        }
+    }
+
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+    @Composable
+    fun Test2() {
+        var touchEnable by remember {
+            mutableStateOf(true)
+        }
+        var touchCount by remember { mutableStateOf(0) }
+
+        val scope = rememberCoroutineScope()
+
+        val snackbarHostState = SnackbarHostState()
+        Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) {
+            Column(Modifier.padding(12.dp)) {
+                Text(text = "Test LaunchedEffect")
+                Button(
+                    enabled = touchEnable,
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f),
+                    onClick = {
+                        if (touchCount == 0) {
+                            scope.launch {
+                                delay(3000)
+                                touchEnable = false
+                            }
+                        }
+                        touchCount += 1
+                    }
+                ) {
+                    Text(text = "Touch me")
+                }
+                Text(text = "Touch count: $touchCount")
+                if (touchCount > 0) {
+                    DelayText(touchCount, snackbarHostState)
+                }
+            }
+        }
     }
 
     @Composable
