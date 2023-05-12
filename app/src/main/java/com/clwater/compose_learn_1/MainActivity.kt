@@ -52,7 +52,55 @@ class MainActivity : ComponentActivity() {
     fun TestLifecycleCompose() {
         val viewModel = LaunchedEffectTestViewModel()
 //        Test1(viewModel)
-        Test2()
+//        Test2()
+        Test3()
+    }
+
+    @Composable
+    fun Test3() {
+        var showTop by remember { mutableStateOf(true) }
+        var showMiddle by remember { mutableStateOf(true) }
+        var showChild by remember { mutableStateOf(true) }
+
+        if (showTop) {
+            Column {
+                DisposableEffect(Unit) {
+                    onDispose {
+                        Log.d("clwater", "Top: DisposableEffect onDispose")
+                    }
+                }
+                Text(text = "Top")
+                Button(onClick = { showTop = false }) {
+                    Text(text = "Hide Top")
+                }
+                if (showMiddle) {
+                    Column {
+                        DisposableEffect(Unit) {
+                            onDispose {
+                                Log.d("clwater", "Middle: DisposableEffect onDispose")
+                            }
+                        }
+                        Text(text = "Middle")
+                        Button(onClick = { showMiddle = false }) {
+                            Text(text = "Hide Middle")
+                        }
+                        if (showChild) {
+                            Column {
+                                DisposableEffect(Unit) {
+                                    onDispose {
+                                        Log.d("clwater", "Child: DisposableEffect onDispose")
+                                    }
+                                }
+                                Text(text = "Child")
+                                Button(onClick = { showChild = false }) {
+                                    Text(text = "Hide Child")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Composable
