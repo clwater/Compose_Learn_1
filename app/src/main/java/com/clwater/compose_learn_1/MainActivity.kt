@@ -11,6 +11,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 
 /**
  * https://developer.android.com/jetpack/compose/side-effects?hl=zh-cn#state-effect-use-cases
+ * https://blog.appcircle.io/article/jetpack-compose-side-effects-with-examples
  */
 class MainActivity : ComponentActivity() {
     companion object {
@@ -53,7 +55,37 @@ class MainActivity : ComponentActivity() {
         val viewModel = LaunchedEffectTestViewModel()
 //        Test1(viewModel)
 //        Test2()
-        Test3()
+//        Test3()
+        Test4()
+    }
+
+    @Composable
+    fun Test4() {
+        var timer by remember { mutableStateOf(0) }
+        var timer2 by remember { mutableStateOf(0) }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column {
+                Text("Time $timer")
+                Text("Time2 $timer2")
+            }
+        }
+
+        LaunchedEffect(timer) {
+            Log.d("clwater", "LaunchedEffect: $timer")
+            delay(1000)
+            timer++
+        }
+
+        SideEffect {
+            Log.d("clwater", "SideEffect: $timer")
+//            Thread.sleep(1000)
+//            delay(1000)
+            timer2 = timer
+        }
     }
 
     @Composable
