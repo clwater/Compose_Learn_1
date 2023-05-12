@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -54,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun DelayText(touchCount: Int, snackbarHostState: SnackbarHostState) {
-        Log.d("gzb", "DelayText: $touchCount")
+        Log.d("clwater", "DelayText: $touchCount")
         val rememberedText by rememberUpdatedState(newValue = touchCount)
         LaunchedEffect(Unit) {
             delay(3000)
@@ -71,6 +74,12 @@ class MainActivity : ComponentActivity() {
         }
         var touchCount by remember { mutableStateOf(0) }
 
+        var trigger by remember { mutableStateOf(0) }
+        val elapsed = animateIntAsState(
+            targetValue = trigger * 1000,
+            animationSpec = tween(trigger * 1000, easing = LinearEasing)
+        )
+
         val scope = rememberCoroutineScope()
 
         val snackbarHostState = SnackbarHostState()
@@ -79,12 +88,16 @@ class MainActivity : ComponentActivity() {
         ) {
             Column(Modifier.padding(12.dp)) {
                 Text(text = "Test LaunchedEffect")
+                Text(text = " Count down: ${(3000 - elapsed.value) / 1000f}")
                 Button(
                     enabled = touchEnable,
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(0.5f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f),
                     onClick = {
                         if (touchCount == 0) {
                             scope.launch {
+                                trigger = 3
                                 delay(3000)
                                 touchEnable = false
                             }
@@ -97,6 +110,17 @@ class MainActivity : ComponentActivity() {
                 Text(text = "Touch count: $touchCount")
                 if (touchCount > 0) {
                     DelayText(touchCount, snackbarHostState)
+                }
+
+                Button(
+                    enabled = !touchEnable,
+                    onClick = {
+                        touchCount = 0
+                        touchEnable = true
+                        trigger = 0
+                    }
+                ) {
+                    Text(text = "Reset")
                 }
             }
         }
