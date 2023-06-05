@@ -104,22 +104,47 @@ class MainActivity : ComponentActivity() {
 //        Text(text = "TestLifecycleCompose")
 //    }
 
-    // # 1.4
-    // https://gist.github.com/clwater/e38e6e686a52652eda7c0ed23c7d9e0c
-    @Composable
-    fun TestLifecycleCompose() {
-        var clickCount by remember {
-            mutableStateOf(0)
-        }
+//    // # 1.4.1
+//    // https://gist.github.com/clwater/e38e6e686a52652eda7c0ed23c7d9e0c
+//    @Composable
+//    fun TestLifecycleCompose() {
+//        var clickCount by remember {
+//            mutableStateOf(0)
+//        }
+//
+//        LaunchedEffect(clickCount) {
+//            Log.d("clwater", "TestLifecycleCompose clickCount: $clickCount")
+//        }
+//
+//        Column {
+//            Button(onClick = { clickCount++ }) {
+//                Text("clickCount $clickCount")
+//            }
+//        }
+//    }
 
-        LaunchedEffect(clickCount) {
-            Log.d("clwater", "TestLifecycleCompose clickCount: $clickCount")
-        }
-
-        Column {
-            Button(onClick = { clickCount++ }) {
-                Text("clickCount $clickCount")
-            }
-        }
-    }
+    // # 1.4.2
+    // https://gist.github.com/clwater/1c1360fc26b295eda9300941690919c2
+//    @Composable
+//    fun TestLifecycleCompose() {
+//        var clickCount by remember {
+//            mutableStateOf(0)
+//        }
+//
+//        LaunchedEffect(clickCount) {
+//            try {
+//                Log.d("clwater", "TestLifecycleCompose clickCount: $clickCount")
+//                delay(1 * 1000)
+//                Log.d("clwater", "TestLifecycleCompose clickCount: $clickCount finish")
+//            } catch (e: Exception) {
+//                Log.d("clwater", "TestLifecycleCompose Error: $e")
+//            }
+//        }
+//
+//        Column {
+//            Button(onClick = { clickCount++ }) {
+//                Text("clickCount $clickCount")
+//            }
+//        }
+//    }
 }
