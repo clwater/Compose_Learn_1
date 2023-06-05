@@ -1,5 +1,6 @@
 package com.clwater.compose_learn_1
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.clwater.compose_learn_1.ui.theme.Compose_Learn_1Theme
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * https://developer.android.com/jetpack/compose/side-effects?hl=zh-cn#state-effect-use-cases
@@ -36,7 +38,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // #1.1
     suspend fun suspendFunTest() {
         Log.d("clwater", "suspendFunTest Start")
         delay(3000)
@@ -147,4 +148,94 @@ class MainActivity : ComponentActivity() {
 //            }
 //        }
 //    }
+
+    // #2.1
+    // https://gist.github.com/clwater/9b56e6c75f6a60b155638d990b89a974
+//    @Composable
+//    fun TestLifecycleCompose() {
+//        // 1️⃣ Error: Suspend function 'suspendFunTest' should be called only from a coroutine or another suspend function
+//        suspendFunTest()
+//
+//        val scope = rememberCoroutineScope()
+//
+//        Button(onClick = {
+//            // 1️⃣ Error: Suspend function 'suspendFunTest' should be called only from a coroutine or another suspend function
+//            suspendFunTest()
+//
+//            scope.launch {
+//                // 3️⃣ Success
+//                suspendFunTest()
+//            }
+//        }) {
+//            Text(text = "suspendFunTest")
+//        }
+//    }
+
+    // #2.2
+    //https://gist.github.com/clwater/3195062cb4b74618bc06699325af62b5
+    @Composable
+    fun TestLifecycleCompose() {
+        var showChild by remember {
+            mutableStateOf(true)
+        }
+
+        var showParent by remember {
+            mutableStateOf(true)
+        }
+
+        val scope = rememberCoroutineScope()
+
+        Column {
+            Row {
+                Button(onClick = {
+                    showParent = false
+                }) {
+                    Text(text = "Hide Parent")
+                }
+
+                Button(onClick = {
+                    showChild = false
+                }) {
+                    Text(text = "Hide Child")
+                }
+            }
+
+            if (showParent) {
+                Button(onClick = {
+                    scope.launch {
+                        try {
+                            Log.d("clwater", "TestLifecycleCompose")
+                            delay(1000 * 1000)
+                        } catch (e: Exception) {
+                            Log.d("clwater", "TestLifecycleCompose Error: $e")
+                        }
+                    }
+                }) {
+                    Text(text = "Parent")
+                }
+            }
+
+            if (showChild) {
+                TestLifecycleComposeChild()
+            }
+        }
+    }
+
+    @Composable
+    fun TestLifecycleComposeChild() {
+        val scope = rememberCoroutineScope()
+
+        Button(onClick = {
+            scope.launch {
+                try {
+                    Log.d("clwater", "TestLifecycleComposeChild")
+                    delay(1000 * 1000)
+                } catch (e: Exception) {
+                    Log.d("clwater", "TestLifecycleComposeChild Error: $e")
+                }
+            }
+        }) {
+            Text(text = "Child")
+        }
+    }
 }
